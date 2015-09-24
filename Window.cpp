@@ -21,7 +21,7 @@ namespace Quack
 
 	void Window::Init(char *title, int width, int height)
 	{
-		if (!glfwInit)
+		if (!glfwInit())
 		{
 			std::cout << "could not initialize GLFW" << std::endl;
 			return;
