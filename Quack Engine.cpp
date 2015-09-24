@@ -1,57 +1,71 @@
-// Quack Engine.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
-#include "Window.h"
 #include "glm/glm.hpp"
+
+#include "Window.h"
+#include "Time.h"
+#include "Game.h"
+
+using namespace Quack;
+
+#define FRAME_CAP 50000;
+
+class QGE
+{
+private:
+	bool isRunning = false;
+	Game game;
+	Time time;
+public:
+	QGE()
+	{
+	}
+	void Start()
+	{
+		if (isRunning)
+			return;
+		game.Start();
+		Update();
+	}
+
+	void Stop()
+	{
+		if (!isRunning)
+			return;
+		isRunning = false;
+	}
+
+	void Update()
+	{
+		isRunning = true;
+
+		while (isRunning)
+		{
+			Render();
+			game.Input();
+			game.Update();
+		}
+	}
+
+	void Render()
+	{
+		//init game window
+		Window window("test", 800, 600);
+		while (!window.Closed())
+		{
+			game.Render();
+			window.Update();
+		}
+		Stop();
+	}
+
+	//getters
+
+	//setters
+};
 
 void main()
 {
-	using namespace Quack;
-
-	Window window("test", 800, 600);
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
-	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-	};
-
-	// This will identify our vertex buffer
-	GLuint vertexbuffer;
-
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vertexbuffer);
-
-	// The following commands will talk about our 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(
-		0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-		);
-
-	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-
-	glDisableVertexAttribArray(0);
-
-	while (!window.Closed())
-	{
-		window.Update();
-	}
+	QGE game;
+	game.Start();
 }
 
